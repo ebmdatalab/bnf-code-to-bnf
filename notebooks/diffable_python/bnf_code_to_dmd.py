@@ -14,7 +14,7 @@
 #     name: python3
 # ---
 
-# # Mapping BNF codes to dm+d
+# # Mapping BNF codes to dm+d - Update November 2024
 
 # We have had a request from NHS England:
 #
@@ -41,6 +41,7 @@ import openpyxl
 
 # ## Create data from BigQuery
 
+# +
 sql = """
   SELECT
   "vmp" AS type, # create type column, shows whether VMP or AMP
@@ -63,7 +64,7 @@ SELECT
   "amp" AS type,
   amp.id,
   amp.descr,
-  vmp.vtm,
+  vmp.vtm AS vtm,
   vtm.nm AS vtm_nm,
   amp.bnf_code AS bnf_code,
   NULL AS amp_previous,
@@ -75,20 +76,23 @@ INNER JOIN
 ON
   amp.vmp = vmp.id
 LEFT OUTER JOIN
-  dmd.vtm AS vtm 
+  dmd.vtm AS vtm
 ON
-  vmp.vtm = vtm.id 
+  vmp.vtm = vtm.id
   """
+
 exportfile = os.path.join("..","data","dmd_df.csv")
-dmd_df = bq.cached_read(sql, csv_path=exportfile, use_cache=True)
+dmd_df = bq.cached_read(sql, csv_path=exportfile, use_cache=False)
 exportfile2 = os.path.join("..","data","bnf_to_dmd.csv")
 dmd_df['id'] = dmd_df['id'].astype('Int64')  # ensure csv is integer
 dmd_df['vtm'] = dmd_df['vtm'].astype('Int64') # ensure csv is integer
 dmd_df['vmp_previous'] = dmd_df['vmp_previous'].astype('Int64') # ensure csv is integer
 exportfile2 = os.path.join("..","data","bnf_to_dmd.csv")
 dmd_df.to_csv(exportfile2) # export integer version
-
+# +
 dmd_df.head()
+# -
+
 
 # As we can see from above we appear to have successfully imported all `VMPs` and `AMPs`.  However, there are some products which either do not have a `VTM` or `bnf_code`.  We will explore this further below.
 
@@ -105,8 +109,8 @@ SELECT
 FROM
   ebmdatalab.hscic.normalised_prescribing AS rx
 WHERE
-  month BETWEEN '2022-09-01'
-  AND '2023-08-01'
+  month BETWEEN '2023-09-01'
+  AND '2024-08-01'
 GROUP BY
   bnf_name,
   bnf_code
@@ -143,5 +147,6 @@ group_vtm_no_dmd.head(30)
 
 # The largest number of prescribing items with a `NULL` `VTM` are either a) where they are not drugs, but appliances or devices (such as Freestyle Libre), OR where the drug has more than 3 ingredients.  In this case (such as Laxido) no VTM is assigned to the formulation in the dm+d.  Therefore it appears that the table accurately reflects what the dm+d says.
 
+# +
 
 
