@@ -83,12 +83,12 @@ ON
 
 exportfile = os.path.join("..","data","dmd_df.csv")
 dmd_df = bq.cached_read(sql, csv_path=exportfile, use_cache=False)
-#exportfile2 = os.path.join("..","data","bnf_to_dmd.csv")
-#dmd_df['id'] = dmd_df['id'].astype('Int64')  # ensure csv is integer
-#dmd_df['vtm'] = dmd_df['vtm'].astype('Int64') # ensure csv is integer
-#dmd_df['vmp_previous'] = dmd_df['vmp_previous'].astype('Int64') # ensure csv is integer
-#exportfile2 = os.path.join("..","data","bnf_to_dmd.csv")
-#dmd_df.to_csv(exportfile2) # export integer version
+exportfile2 = os.path.join("..","data","bnf_to_dmd.csv")
+dmd_df['id'] = dmd_df['id'].astype('Int64')  # ensure csv is integer
+dmd_df['vtm'] = dmd_df['vtm'].astype('Int64') # ensure csv is integer
+dmd_df['vmp_previous'] = dmd_df['vmp_previous'].astype('Int64') # ensure csv is integer
+exportfile2 = os.path.join("..","data","bnf_to_dmd.csv")
+dmd_df.to_csv(exportfile2) # export integer version
 # +
 dmd_df.head()
 # -
